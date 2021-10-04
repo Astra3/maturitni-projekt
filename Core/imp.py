@@ -10,8 +10,7 @@ def imp(inp: str, drop: bool = True) -> pd.DataFrame:
     """
     Funkce přijímá cestu k exportovanému souboru z Davis Instruments software.
 
-    :param drop: definuje zda zanechat pouze žádané položky nebo ne, tzn. že z původní databáze zanechá pouze
-    out_temp, out_humidity, dew_point, wind_speed, wind_dir, gust a bar
+    :param drop: definuje zda zanechat pouze žádané položky nebo ne, tzn. že z původní databáze zanechá pouze out_temp, out_humidity, dew_point, wind_speed, wind_dir, gust a bar
     :param inp: cesta k souboru s daty
     :return: DataFrame všech hodnot
     :raises FileNotFoundError: při špatném zadání souboru
@@ -46,12 +45,12 @@ def imp(inp: str, drop: bool = True) -> pd.DataFrame:
 
 
 class Combine:
-    def __init__(self, df1: pd.DataFrame):
-        """
-        Třída ke jednoduchým úpravám DataFrame a importu.
+    """
+    Třída ke jednoduchým úpravám DataFrame a importu.
 
-        :param df1: DataFrame, se kterým se bude pracovat
-        """
+    :param df1: DataFrame, se kterým se bude pracovat
+    """
+    def __init__(self, df1: pd.DataFrame):
         self.df = df1
 
     def combine_drop(self, df_append: pd.DataFrame, duplicate_index: str = "df_append"):
@@ -77,8 +76,7 @@ class Combine:
         index df2 přežije.
 
         :param df_append: druhý DataFrame v pořadí
-        :param duplicate_index: přijímá "df2" pro odstranění dupes v df2 a "df" pro odstranění dupes ve výsledném
-        DataFrame
+        :param duplicate_index: přijímá "df2" pro odstranění dupes v df2 a "df" pro odstranění dupes ve výsledném DataFrame
         :return: zkombinovaný DataFrame
         :raises ValueError: při špatné hodnotě duplicate_index
         """
@@ -115,8 +113,7 @@ def old_import(file: str, drop: bool = True) -> pd.DataFrame:
 
     >>> old_import("2021.txt")
 
-    :param drop: definuje zda zanechat pouze žádané položky nebo ne, tzn. že z původní databáze zanechá pouze
-    out_temp, out_humidity, dew_point, wind_speed, wind_dir, gust a bar
+    :param drop: definuje zda zanechat pouze žádané položky nebo ne, tzn. že z původní databáze zanechá pouze out_temp, out_humidity, dew_point, wind_speed, wind_dir, gust a bar
     :param file: .csv soubor pro přijetí
     :return: pandas DataFrame přijatého souboru
     :raises FileNotFoundError: pokud input file neexistuje na disku

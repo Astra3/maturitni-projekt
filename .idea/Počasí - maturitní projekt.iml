@@ -5,6 +5,9 @@
       <sourceFolder url="file://$MODULE_DIR$/Base data" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/nepotřebné" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
+      <excludeFolder url="file://$MODULE_DIR$/docs/_build" />
+      <excludeFolder url="file://$MODULE_DIR$/docs/_static" />
+      <excludeFolder url="file://$MODULE_DIR$/docs/_templates" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
