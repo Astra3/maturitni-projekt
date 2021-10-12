@@ -1,19 +1,25 @@
 """Tento soubor obsahuje třídu k importu .txt souboru s daty počasí."""
 import os.path
 from io import StringIO
+from os import PathLike
 
 import pandas as pd
 import sqlalchemy
 
 
-def imp(inp: str, drop: bool = True) -> pd.DataFrame:
+def data_imp(inp: PathLike[str], drop: bool = True) -> pd.DataFrame:
     """
-    Funkce přijímá cestu k exportovanému souboru z Davis Instruments software.
 
-    :param drop: definuje zda zanechat pouze žádané položky nebo ne, tzn. že z původní databáze zanechá pouze out_temp, out_humidity, dew_point, wind_speed, wind_dir, gust a bar
-    :param inp: cesta k souboru s daty
-    :return: DataFrame všech hodnot
-    :raises FileNotFoundError: při špatném zadání souboru
+    Args:
+        inp: cesta k souboru s daty
+        drop: definuje zda zanechat pouze žádané položky nebo ne, tzn. že z původní databáze zanechá pouze out_temp,
+            out_humidity, dew_point, wind_speed, wind_dir, gust a bar
+
+    Returns:
+        DataFrame všech hodnot
+
+    Raises:
+        FileNotFoundError: při špatném zadání hodnot
     """
     if not os.path.isfile(inp):
         raise FileNotFoundError("Vstupní soubor nebyl nalezen")
@@ -34,7 +40,7 @@ def imp(inp: str, drop: bool = True) -> pd.DataFrame:
     data = "".join(data)
 
     # StringIO vlastně převede string na file stream
-    df = pd.read_csv(StringIO(data), sep="\t", parse_dates=[0], na_values=["nan", "nannan"])
+    df = pd.read_csv(StringIO(data), sep="\t", parse_dates=[0], na_values=["---"])
 
     df.set_index("datetime", inplace=True)
     df = df.tz_localize("Europe/Prague", ambiguous="infer")
@@ -44,54 +50,65 @@ def imp(inp: str, drop: bool = True) -> pd.DataFrame:
     return df
 
 
+def imp(conn: sqlalchemy.engine.base.Engine, table_name: str = "pocasi"):
+    """
+    Funkce importující data z SQL databáze
+
+    Args:
+        conn: SQLAlchemy connection
+        table_name: jméno tabulky
+
+    Returns:
+        dataframe počasí z SQL
+    """
+    df = pd.read_sql(table_name, conn, index_col=["datetime"])
+
+    return df
+
+
 class Combine:
     """
     Třída ke jednoduchým úpravám DataFrame a importu.
 
-    :param df1: DataFrame, se kterým se bude pracovat
+    Args:
+        df1: DataFrame, se kterým se bude pracovat
     """
+
     def __init__(self, df1: pd.DataFrame):
         self.df = df1
 
-    def combine_drop(self, df_append: pd.DataFrame, duplicate_index: str = "df_append"):
+    def combine(self, *df_append: pd.DataFrame):
         """
-        Metoda kombinující dohromady výchozí DataFrame a df_append s kontrolou a odstranění duplicitního indexu.
-        Výsledný DataFrame bude vrácen, bude ale také uložen jako hlavní DataFrame třídy
+        Metoda kombinující dohromady všechny zadané DataFrames
 
         Příklad použití:
 
-        >>> df
+        >>> dataframe = pd.DataFrame([[5, 2, 5, 2], [10, 2, 8, 2]])
+        >>> dataframe
             0  1  2  3
         0   5  2  5  2
         1  10  2  8  2
-        >>> df_append
+        >>> dataframe_append = pd.DataFrame([[5, 10, 3, 5]])
+        >>> dataframe_append
            0   1  2  3
         0  5  10  3  5
-        >>> comb = Combine(df)
-        >>> comb.combine_drop(df_append, "df")
-            0  1  2  3
-        1  10  2  8  2
+        >>> comb = Combine(dataframe)
+        >>> comb.combine(dataframe_append)
+            0   1  2  3
+        0   5   2  5  2
+        1  10   2  8  2
+        0   5  10  3  5
 
-        Ve výše napsaném příkladu můžeme vidět kombinaci dvou DataFrames se stejnými indexy, ve výsledku pouze nultý
-        index df2 přežije.
+        Ve výše napsaném příkladu můžeme vidět kombinaci dvou DataFrames se stejnými indexy a jejich kombinaci do
+        jednoho.
 
-        :param df_append: druhý DataFrame v pořadí
-        :param duplicate_index: přijímá "df2" pro odstranění dupes v df2 a "df" pro odstranění dupes ve výsledném DataFrame
-        :return: zkombinovaný DataFrame
-        :raises ValueError: při špatné hodnotě duplicate_index
+        Args:
+            df_append: několik DataFrames následujících za sebou
+
+        Returns:
+            spojený DataFrame, rovněž také uloží daný DataFrame do objektu
         """
-        pas = True
-        # TODO: tohle může být switch statement od Python 3.10
-        if duplicate_index == "df_append":
-            Combine._drop_dupe_index(df_append)
-            pas = False
-
-        df = self.df.append(df_append)
-
-        if duplicate_index == "df":
-            Combine._drop_dupe_index(df)
-        elif pas:
-            raise ValueError("Zadána špatná hodnota pro duplicates")
+        df = self.df.append(list(df_append))
 
         self.df = df
         return df
@@ -99,32 +116,75 @@ class Combine:
     def to_sql(self, conn: sqlalchemy.engine.base.Engine, table_name: str = "pocasi"):
         self.df.to_sql(table_name, conn, if_exists="replace")
 
-    @staticmethod
-    def _drop_dupe_index(data: pd.DataFrame):
-        data.drop(index=data[data.index.duplicated()].index, inplace=True)
 
-
-def old_import(file: str, drop: bool = True) -> pd.DataFrame:
+class LegacyImport:
     """
-    Funkce přijme .csv soubor počasí a převede jej do DataFrame. První column je převedena na datetime objekt a je
-    na ni nastaven Europe/Prague timezone. **Funkce je pouze pro starý formát a je zbytečná pro nový.**
+    Třída obsahující funkce a metody sloužící k importu starých formátů souborů. Nepoužité front-endem.
 
-    Příklad použití na databázi počasí:
-
-    >>> old_import("2021.txt")
-
-    :param drop: definuje zda zanechat pouze žádané položky nebo ne, tzn. že z původní databáze zanechá pouze out_temp, out_humidity, dew_point, wind_speed, wind_dir, gust a bar
-    :param file: .csv soubor pro přijetí
-    :return: pandas DataFrame přijatého souboru
-    :raises FileNotFoundError: pokud input file neexistuje na disku
     :meta private:
     """
-    if not os.path.exists(file):
-        raise FileNotFoundError("Zadaný soubor neexistuje.")
 
-    data: pd.DataFrame = pd.read_csv(file, parse_dates=[1])
-    data.set_index("datetime", inplace=True)
-    data = data.tz_localize("Europe/Prague", ambiguous="infer")
-    if drop:
-        data = data[["out_temp", "out_humidity", "dew_point", "wind_speed", "wind_dir", "gust", "bar"]]
-    return data
+    @staticmethod
+    def old_import(file: PathLike[str], ambiguous_localize: str = "infer", drop: bool = True, dropna_index: bool = True,
+                   remove_duplicit_index: bool = True) -> pd.DataFrame:
+        """
+        Funkce přijme .csv soubor počasí a převede jej do DataFrame. První column je převedena na datetime objekt a je
+        na ni nastaven Europe/Prague timezone. **Funkce je pouze pro starý formát a je zbytečná pro nový.**
+
+        Args:
+            file: .csv soubor pro přijetí
+            ambiguous_localize: ambiguous parametr k funkci :doc:`tz_localize <pandas:reference/api/pandas.DataFrame.tz_localize>`
+            drop: definuje zda zanechat pouze žádané položky nebo ne, tzn. že z původní databáze zanechá pouze 
+                out_temp, out_humidity, dew_point, wind_speed, wind_dir, gust a bar
+            dropna_index: pokud True, tak odstraní všechny NaT hodnoty z indexu
+            remove_duplicit_index: umožňuje odstranit duplicitní index z importovaných dat
+
+        Returns:
+            pandas DataFrame přijatého souboru
+            
+        Raises:
+            FileNotFoundError: pokud input file neexistuje na disku
+        """
+        if not os.path.exists(file):
+            raise FileNotFoundError("Zadaný soubor neexistuje.")
+
+        na_values = ["nan", "---", "--.-", "--"]
+        data: pd.DataFrame = pd.read_csv(file, parse_dates=[1], na_values=na_values, low_memory=False)
+
+        data.set_index("datetime", inplace=True)
+        if remove_duplicit_index:  # index se odstraní až když je "datetime" indexem
+            LegacyImport._drop_dupe_index(data)
+
+        # lokalizace time zone
+        data = data.tz_localize("Europe/Prague", ambiguous=ambiguous_localize, nonexistent="shift_forward")
+        if dropna_index:
+            data = data[data.index.notna()]
+
+        if drop:
+            data = data[["out_temp", "out_humidity", "dew_point", "wind_speed", "wind_dir", "gust", "bar"]]
+        return data
+
+    @staticmethod
+    def conv2012(inp: PathLike[str] = "2012.csv") -> pd.DataFrame:
+        """
+        Tato funkce dokáže vzít formát data z roku 2012 a převést jej na
+        `ISO 8601 <https://en.wikipedia.org/wiki/ISO_8601>`_.
+
+        Args:
+            inp: jméno souboru k úpravě
+
+        Returns:
+            DataFrame se správným formátem datu
+        """
+        df = pd.read_csv(inp, parse_dates=["datetime"])
+        return df
+
+    @staticmethod
+    def _drop_dupe_index(data: pd.DataFrame):
+        """
+        Funkce odstraní jakýkoliv duplicitní index z DataFrame.
+
+        Args:
+            data: odstranit data z tohoto DataFrame
+        """
+        data.drop(index=data[data.index.duplicated()].index, inplace=True)
