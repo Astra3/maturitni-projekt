@@ -6,6 +6,8 @@ from os import PathLike
 import pandas as pd
 import sqlalchemy
 
+from Core import conn
+
 
 def data_imp(inp: PathLike[str], drop: bool = True) -> pd.DataFrame:
     """
@@ -113,13 +115,14 @@ class Combine:
         self.df = df
         return df
 
-    def to_sql(self, conn: sqlalchemy.engine.base.Engine, table_name: str = "pocasi"):
+    def to_sql(self, table_name: str = "pocasi"):
         self.df.to_sql(table_name, conn, if_exists="replace")
 
 
 class LegacyImport:
     """
-    Třída obsahující funkce a metody sloužící k importu starých formátů souborů. Nepoužité front-endem.
+    Třída obsahující funkce a metody sloužící k importu starých formátů souborů. Nepoužité front-endem a označené jako
+    private třída pro Sphinx.
 
     :meta private:
     """

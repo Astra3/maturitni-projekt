@@ -1,5 +1,7 @@
 pandas
 SQLAlchemy
 sphinx
-insegel
+furo
 myst-parser
+sphinx-copybutton
+sphinx_design
