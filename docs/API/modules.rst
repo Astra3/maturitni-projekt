@@ -1,7 +1,7 @@
-Core
-====
+Pocasi
+======
 
 .. toctree::
    :maxdepth: 4
 
-   Core
+   Pocasi

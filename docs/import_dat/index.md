@@ -8,4 +8,6 @@ Následující dokumenty slouží k popsání procesu importování dat z různ�
 správný_import
 old_import
 současný_import
+srážky
+import_proces
 ```

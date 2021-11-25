@@ -22,11 +22,11 @@ add_line = ClassDocumenter.add_line
 line_to_delete = _(u'Bases: %s') % u':class:`object`'
 
 
-# tohle je prostě rychle udělaný patch zkopírovaný odsud: https://stackoverflow.com/questions/46279030/how-can-i-prevent-sphinx-from-listing-object-as-a-base-class
+# tohle je prostě rychle udělaný patch zkopírovaný odsud:
+# https://stackoverflow.com/questions/46279030/how-can-i-prevent-sphinx-from-listing-object-as-a-base-class
 def add_line_no_object_base(self, text, *args, **kwargs):
     if text.strip() == line_to_delete:
         return
-
     add_line(self, text, *args, **kwargs)
 
 
@@ -36,16 +36,25 @@ add_directive_header = ClassDocumenter.add_directive_header
 def add_directive_header_no_object_base(self, *args, **kwargs):
     # noinspection PyArgumentList
     self.add_line = add_line_no_object_base.__get__(self)
-
     # noinspection PyNoneFunctionAssignment
     result = add_directive_header(self, *args, **kwargs)
-
     del self.add_line
-
     return result
 
 
 ClassDocumenter.add_directive_header = add_directive_header_no_object_base
+
+
+def data_import(inp="../data_import.py"):
+    with open(inp, "r") as file:
+        lines = file.readlines()
+    lines = lines[1:]
+    for i, text in enumerate(lines):
+        lines[i] = ">>> " + text
+    lines = "".join(lines)
+    output = "```pycon\n" + lines + "```\n"
+    return output
+
 
 # -- Project information -----------------------------------------------------
 
@@ -67,13 +76,18 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx_copybutton",
     "sphinx_design",
-    "sphinx.ext.autosummary"
+    "sphinx.ext.viewcode"
 ]
 
 myst_enable_extensions = [
     "colon_fence",
-    "replacements"
+    "replacements",
+    "substitution"
 ]
+
+myst_substitutions = {
+    "data_import": data_import()
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

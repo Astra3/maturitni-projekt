@@ -5,7 +5,7 @@ ze staré meteostanice. Celý tento proces byl relativně trial and error.
 
 ---
 
-[comment]: <> (tohle je potřeba odkazovat zvlášť kvůli tomu nadpisu protože v něm je code...prostě lmao)
+% tohle je potřeba odkazovat zvlášť kvůli tomu nadpisu protože v něm je code...prostě lmao
 (txt-format)=
 
 ## `.txt` formát
@@ -161,10 +161,37 @@ Pro zkopírování klikněte třikrát na danou hlavičku a pak použijte Ctrl+V
 ## Třída `LegacyImport`
 
 ```{eval-rst}
-..  autoclass:: Core.imp.LegacyImport
+..  autoclass:: Pocasi.core.imp.LegacyImport
     :members:
     :noindex:
 ```
+
+## Postup programu při importu dat ze souborů
+
+Jak lze vidět, metoda {meth}`old_import <Pocasi.core.imp.LegacyImport.old_import>` má spoustu parametrů pro použití, a s
+každým z nich se nakládá jinak. Nejprve funkce testuje, zda soubor zadaný do `file` vůbec existuje. Poté si funkce
+vytvoří proměnnou `na_values` s NaN definicemi, které jsem objevil při analýze dat.
+
+Dále se inicializuje parser na data a pak se za pomocí {doc}`pandas:reference/api/pandas.read_csv` přečte `.csv` soubor
+s daty. Jako sloupec s daty se automaticky bere druhý sloupec, do parametru `na_values` se dává stejnojmenná
+proměnná, `low_memory` se dává na False kvůli lepšímu a příjemnějšímu určení datových typů. Nakonec, do `date_parser` se
+buď dává stejnojmenná funkce inicializovaná dříve, nebo None, na základě parametru `is_iso8601`. Nakonec se datum
+nastaví jako index.
+
+Nyní je na řade převedení dat do timezone aware formátu, jako timezone se automaticky bere Europe/Prague. Poté se na
+základě parametru `remove_duplicit_index` odstraní duplicitní index dat za pomocí skryté metody
+{meth}`drop_dupe_index <Pocasi.core.imp.LegacyImport._drop_dupe_index>`.
+
+Úplně na závěr se odstraní přebytečné, a pro tento projekt nezajímavé, data, sloupec "day_rain" se přejmenuje na "rain",
+jen kvůli konzistenci.
+
+% @formatter:off
+:::{warning}
+% @formatter:on
+
+Některé hodnoty se dávají na zpracování přímo modulu `pandas`. Na základě uživatelské chyby může program vyhodit
+výjimku.
+:::
 
 [^1]: Odpověď se skriptem
 na [ask.libreoffice.org](https://ask.libreoffice.org/t/how-do-i-export-all-sheets-from-a-spreadsheet/12024/4)
