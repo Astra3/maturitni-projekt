@@ -45,16 +45,34 @@ používají [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)
 formát na data.
 
 % @formatter:off
-:::{admonition} Pozor na roky **2018** a **2012**
+:::{admonition} Pozor na roky **2018** a **2012** a **červen 2015**!
 :class: attention
 % @formatter:on
 
 Rok 2018 je v datech zapsaný jinak, veškeré data až do půlky prosince jsou v `.txt` souborech. Nicméně druhá půlka
 prosince je v Excel souboru. Tento problém se řeší stejně, jako {ref}`Excel formát`. Tato část prosince má rovněž jinou
-hlavičku (viz kapitola {ref}`Hlavičky textu`)
+hlavičku (viz kapitola {ref}`Hlavičky textu`). {ref}`Červen roku 2015` je kombinace mezinárodního formátu data a
+místního.
 
-Rovněž také pozor na rok 2012 (viz {ref}`Rok 2012`).
+Rovněž také pozor na rok 2012 (viz {ref}`Rok 2012`) a červen roku 2015.
 :::
+
+### Červen roku 2015
+
+Červen roku 2015 je z půlky napsaný v ISO 8601 a z menší, druhé půlky v místním časovém formátu. Při nezpracování může v
+datech nastat následující situace:
+
+```none
+2015-01-07 00:06:00    13.9
+2015-01-07 00:07:00   -14.5
+2015-01-07 00:16:00    13.6
+2015-01-07 00:17:00   -14.4
+2015-01-07 00:26:00    13.4
+```
+
+Data zde se ukazují, jako že jsou v lednu, v reálu hodnoty s pozitivní teplotou jsou v červnu. Formát dat vypadá
+následovně `2015-01-07` pro leden a `1.7.2015` pro červen. Stejně jako u zapeklité situace s
+{ref}`rokem 2012 <Rok 2012>`, rovněž i zde můžeme použít metodu {meth}`Pocasi.core.imp.LegacyImport.conv2012`.
 
 ## Excel formát
 
@@ -97,12 +115,12 @@ uloží jako `jméno_listu.csv` do zadané cesty.
 
 Po zkombinování všech `.csv` souborů se setkáme s následující tabulkou (po otevření v tabulkovém editoru):
 
-|    |                    |    |      |    |     |    |        |       |     |     |   |     |     |      |      |      |      |      |
-|----|--------------------|----|------|----|-----|----|--------|-------|-----|-----|---|-----|-----|------|------|------|------|------|
-| 57 | 01.10.2019 0:02:50 | 10 | 19.1 | 69 | 8.4 | 89 | 1007.4 | 960.6 | 0.0 | 0.0 | E | 6.7 | 8.4 | 0.00 | 0.00 | 1.80 | 0.00 | 1.80 |
-| 58 | 01.10.2019 0:12:50 | 10 | 19.1 | 69 | 8.2 | 89 | 1007.4 | 960.6 | 0.0 | 0.0 | S | 6.5 | 8.2 | 0.00 | 0.00 | 1.80 | 0.00 | 1.80 |
-| 59 | 01.10.2019 0:22:50 | 10 | 19.1 | 69 | 8.2 | 90 | 1007.5 | 960.7 | 0.0 | 0.0 | S | 6.7 | 8.2 | 0.00 | 0.00 | 1.80 | 0.00 | 1.80 |
-| 60 | 01.10.2019 0:32:50 | 10 | 19.1 | 69 | 8.1 | 90 | 1007.6 | 960.8 | 0.0 | 0.0 | S | 6.6 | 8.1 | 0.00 | 0.00 | 1.80 | 0.00 | 1.80 |
+|     |                    |     |      |     |     |     |        |       |     |     |     |     |     |      |      |      |      |      |
+|-----|--------------------|-----|------|-----|-----|-----|--------|-------|-----|-----|-----|-----|-----|------|------|------|------|------|
+| 57  | 01.10.2019 0:02:50 | 10  | 19.1 | 69  | 8.4 | 89  | 1007.4 | 960.6 | 0.0 | 0.0 | E   | 6.7 | 8.4 | 0.00 | 0.00 | 1.80 | 0.00 | 1.80 |
+| 58  | 01.10.2019 0:12:50 | 10  | 19.1 | 69  | 8.2 | 89  | 1007.4 | 960.6 | 0.0 | 0.0 | S   | 6.5 | 8.2 | 0.00 | 0.00 | 1.80 | 0.00 | 1.80 |
+| 59  | 01.10.2019 0:22:50 | 10  | 19.1 | 69  | 8.2 | 90  | 1007.5 | 960.7 | 0.0 | 0.0 | S   | 6.7 | 8.2 | 0.00 | 0.00 | 1.80 | 0.00 | 1.80 |
+| 60  | 01.10.2019 0:32:50 | 10  | 19.1 | 69  | 8.1 | 90  | 1007.6 | 960.8 | 0.0 | 0.0 | S   | 6.6 | 8.1 | 0.00 | 0.00 | 1.80 | 0.00 | 1.80 |
 
 % @formatter:off
 :::{admonition} Místní datový formát
@@ -146,10 +164,10 @@ Různé formáty dat mají různé hlavičky, tzn. že Excel formát má jiné h
 Tohle pravidlo platí víceméně pro celou dokumentaci, až na slavný rok 2012 - ten sdílí hlavičku s ostatními `.txt`
 soubory. Hlavičky všech souborů vypadají tedy následovně:
 
-|Formát|Hlavička|
-|------|--------|
-|`.txt` a 2012 | `no,datetime,interval,in_humidity,in_temp,out_humidity,out_temp,abs_pressure,wind_speed,gust,wind_dir,bar,dew_point,windchill,hour_rain,day_rain,week_rain,month_rain,total_rain,wind_level,gust_level` |
-|Excel | `no,datetime,interval,in_temp,in_humidity,out_temp,out_humidity,bar,abs_pressure,wind_speed,gust,wind_dir,dew_point,windchill,hour_rain,day_rain,week_rain,month_rain,total_rain` |
+| Formát        | Hlavička                                                                                                                                                                                                |
+|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `.txt` a 2012 | `no,datetime,interval,in_humidity,in_temp,out_humidity,out_temp,abs_pressure,wind_speed,gust,wind_dir,bar,dew_point,windchill,hour_rain,day_rain,week_rain,month_rain,total_rain,wind_level,gust_level` |
+| Excel         | `no,datetime,interval,in_temp,in_humidity,out_temp,out_humidity,bar,abs_pressure,wind_speed,gust,wind_dir,dew_point,windchill,hour_rain,day_rain,week_rain,month_rain,total_rain`                       |
 
 % @formatter:off
 :::{note}

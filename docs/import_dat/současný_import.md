@@ -29,7 +29,10 @@ Dále se použije parser dat pro lokální časový formát a celá proměnná s
 Jako finální krok nastavíme datum jako index a převedeme jej to timezone aware formátu, kterým je fixně "Europe/Prague".
 Nakonec odstraníme hodnoty přebytečné pro tento projekt, například síla signálu venkovního senzoru ke stanici.
 
-## Obsah skriptu `Core.imp`
+Pro usnadnění celého procesu existuje i třída {class}`ImportSave <Pocasi.core.imp.ImportSave>`, která si automaticky
+vezme DataFrame, se kterým se pracuje, přidá k němu data a uloží jej do výchozí cesty, společně se srážkami.
+
+## Obsah skriptu `Pocasi.imp`
 
 ```{eval-rst}
 ..  automodule:: Pocasi.core.imp

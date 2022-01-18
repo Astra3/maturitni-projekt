@@ -1,12 +1,13 @@
-"""Tento soubor obsahuje třídu k importu .txt souboru s daty počasí."""
+"""Tento soubor obsahuje tříd určené k importu dat počasí ve všech možných formátech."""
 import datetime
 import os.path
 from io import StringIO
 
 import numpy as np
 import pandas as pd
+from scipy.signal import find_peaks
 
-from Pocasi import data_path, rain_path
+from Pocasi import data_path, rain_path, time_zone
 
 
 def data_imp(inp="PathLike[str]", drop: bool = True) -> pd.DataFrame:
@@ -16,7 +17,7 @@ def data_imp(inp="PathLike[str]", drop: bool = True) -> pd.DataFrame:
     Args:
         inp: cesta k souboru s daty
         drop: definuje zda zanechat pouze žádané položky nebo ne, tzn. že z původní databáze zanechá pouze out_temp,
-            out_humidity, dew_point, wind_speed, wind_dir, gust a bar
+            out_humidity, dew_point, wind_speed, wind_dir, gust bar a rain_data
 
     Returns:
         DataFrame všech hodnot
@@ -29,13 +30,14 @@ def data_imp(inp="PathLike[str]", drop: bool = True) -> pd.DataFrame:
 
     with open(inp, "r") as file:
         data = file.readlines()
+    # odstraní header a tabulátor u časových dat
     data = data[2:]
     data = [i.replace("\t", " ", 1) for i in data]
 
     # vloží vlastní hlavičku
     data.insert(0,
                 "datetime\tout_temp\thi_out_temp\tlow_out_temp\tout_humidity\tdew_point\twind_speed\twind_dir\t"
-                "wind_run\tgust\thi_wind_dir\twindchill\theat_index\tTHW_index\tbar\train\train_rate\t"
+                "wind_run\tgust\thi_wind_dir\twindchill\theat_index\tTHW_index\tbar\train_data\train_rate\t"
                 "head_d-d\tcool_d-d\tin_temp\tin_humidity\tin_dew_point\tin_heat_index\tin_EMC\tin_air_density\t"
                 "wind_samp\twind_Tx\tISS_reception\tarc_interval\n")
 
@@ -52,21 +54,24 @@ def data_imp(inp="PathLike[str]", drop: bool = True) -> pd.DataFrame:
     df = pd.read_csv(StringIO(data), sep="\t", parse_dates=[0], date_parser=data_parser, na_values=["---", "------"])
 
     df.set_index("datetime", inplace=True)
-    df = df.tz_localize("Europe/Prague", ambiguous="infer")
+    df = df.tz_localize(time_zone, ambiguous="infer")
     if drop:
-        df = df[["out_temp", "out_humidity", "dew_point", "wind_speed", "wind_dir", "gust", "bar", "rain"]]
+        df = df[["out_temp", "out_humidity", "dew_point", "wind_speed", "wind_dir", "gust", "bar", "rain_data"]]
 
     return df
 
 
-def imp():
+def imp(rain: bool = False):
     """
     Funkce importující data z Feather databáze definovanou v __init__
 
+    Args:
+        rain: definuje, zda importovat z ``rain_path`` nebo z ``data_path``
+
     Returns:
-        dataframe počasí z Feather
+        dataframe počasí z Feather formátu
     """
-    df = pd.read_feather(data_path)
+    df = pd.read_feather(rain_path) if rain else pd.read_feather(data_path)
     df.set_index("datetime", inplace=True)
 
     return df
@@ -89,7 +94,7 @@ class EditData:
 
     def combine(self, *df_append: pd.DataFrame | pd.Series):
         """
-        Metoda kombinující dohromady všechny zadané DataFrames
+        Metoda kombinující dohromady všechny zadané DataFrames, seřadí index a odstraní duplicitní index.
 
         Příklad použití:
 
@@ -124,35 +129,69 @@ class EditData:
         self.df = df
         return df
 
-    # noinspection PyUnresolvedReferences
     def rainfall(self, old=False, drop_rain: bool = True, localize: str | None = None) -> pd.Series:
         """
-        Funkce vracející Series s daty o denních srážkách. Metoda bere data ze sloupce "rain" z DataFrame
+        Funkce vracející Series s daty o denních srážkách. Metoda bere data ze sloupce "rain_data" z DataFrame
         inicializovaném v objektu této třídy. Více o funkci v kapitole :ref:`Srážky v počasí`.
 
         Args:
-            localize: pokud není None, tak lokalizuje rainfall do zadané časové zóny
+            localize: lokalizuje rainfall do zadané časové zóny, pokud je None, odstraní lokalizaci časové zóny
             old: rozlišuje mezi starým formátem srážek a novým (starý formát bere srážky na konci dne, nový sčítá srážky
              za celý den)
-            drop_rain: pokud True, tak odstraní "rain" column z DataFrame
+            drop_rain: pokud True, tak odstraní "rain_data" column z DataFrame
 
         Returns:
             index tvoří data dnů a data je počet srážek za daný den
         """
-        rain = self.df["rain"].groupby(self.df.index.date)
+        rain = self.df["rain_data"].resample("D")
         if old:
-            rainfall: pd.Series = rain.tail(1)
-            rainfall.index = pd.to_datetime(rainfall.index.date)
+            rainfall: pd.Series = rain.last()
         else:
             rainfall = rain.sum()
-            rainfall.index = pd.to_datetime(rainfall)
 
-        if localize:
+        if localize is None or type(localize) == str:
             rainfall = rainfall.tz_localize(localize)
 
         if drop_rain:
-            self.df.drop("rain", axis=1, inplace=True)
+            self.df.drop("rain_data", axis=1, inplace=True)
         return rainfall
+
+    def filter_unrealistic_data(self):
+        """
+        Obsahuje definici maximálních a minimálních parametrů. Rovněž filtruje všechny výkyvy v datech. *Rovněž smaže
+        duplicitní data v indexu!*
+
+        """
+
+        self.df.drop(index=self.df[self.df.index.duplicated()].index, inplace=True)
+
+        # dictionary sloupců, kde každý sloupec má tuple s (min, max) hodnotami pro daný sloupec
+        min_max_values = {
+            "out_temp": (-100, 100),
+            "out_humidity": (1, 100),
+            "dew_point": (-100, 100),
+            "wind_speed": (0, 80),
+            "bar": (800, 1200)
+        }
+
+        # prochází sloupec za sloupcem a maže hodnoty zapsané výše
+        for name, values in min_max_values.items():
+            self.df.loc[self.df[name] < values[0], name] = np.nan
+            self.df.loc[self.df[name] > values[1], name] = np.nan
+
+        # hledá peaks v každém sloupci (výjimku tvoří směr větru)
+        # multiply zde slouží k pozdějšímu obrácení hodnot v DataFrame, změní se na -1
+        multiply = 1
+        for _ in range(2):
+            for i in self.df.drop(columns="wind_dir").keys():
+                data = self.df[i].dropna().copy()
+                p, _ = find_peaks(data.values * multiply, threshold=3)  # find_peaks vrací pouze indexy
+                while p.size > 0:  # kontroluje zda find_peaks vůbec něco vrací
+                    data.loc[data.iloc[p].index] = np.nan  # nahradí data získané z find_peaks za nan
+                    self.df.loc[data.index, i] = data  # uloží do hlavního df celé třídy
+                    data = self.df[i].dropna().copy()  # a cyklus se opakuje
+                    p, _ = find_peaks(data.values * multiply, threshold=3)
+            multiply = -1
 
     def to_feather(self, rain: bool = False):
         """
@@ -167,6 +206,53 @@ class EditData:
         save.to_feather(path)
 
 
+class ImportSave:
+    """
+    Tato třída umí jednoduše naimportovat data ze souboru, převést je databáze, přidat je a uložit. Měla by být výhradně
+    použita v rámci context manageru.
+
+    Raises:
+        ValueError: pokud se nenaleznou buď data srážek, nebo počasí - pokud neexistuje ani jedno, tak jsou automaticky
+            vytvořeny
+    """
+
+    def __init__(self):
+        from Pocasi import pocasi_data, rain_data
+
+        if (pocasi_data is None) != (rain_data is None):
+            raise ValueError("Chybí data počasí nebo srážek!")
+
+        if (pocasi_data is None) and (rain_data is None):
+            # tahle situace by se reálně neměla stát, a tudíž nebude testovaná
+            self.pocasi = EditData(pd.DataFrame())
+            self.rain = EditData(pd.DataFrame())
+        else:
+            self.pocasi = EditData(pocasi_data)
+            self.rain = EditData(rain_data)
+
+    def import_append(self, file="PathLike[str]"):
+        """
+        Rychlý import a přidání do DataFrames
+
+        Args:
+            file: soubor nového formátu, ze kterého importovat
+        """
+        df = data_imp(file)
+        edit = EditData(df)
+        self.rain.combine(edit.rainfall())
+        self.pocasi.combine(edit.df)
+
+    def close(self):
+        self.rain.to_feather(True)
+        self.pocasi.to_feather()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
+
 class LegacyImport:
     """
     Třída obsahující funkce a metody sloužící k importu starých formátů souborů. Nepoužité front-endem a označené jako
@@ -177,8 +263,7 @@ class LegacyImport:
 
     @staticmethod
     def old_import(file="PathLike[str]", ambiguous_localize: str = "infer", drop: bool = True, is_iso8601: bool = True,
-                   dropna_index: bool = True,
-                   remove_duplicit_index: bool = True) -> pd.DataFrame:
+                   dropna_index: bool = True, remove_duplicit_index: bool = True) -> pd.DataFrame:
         """
         Funkce přijme .csv soubor počasí a převede jej do DataFrame. První column je převedena na datetime objekt a je
         na ni nastaven Europe/Prague timezone. **Funkce je pouze pro starý formát a je zbytečná pro nový.**
@@ -204,43 +289,47 @@ class LegacyImport:
 
         na_values = ["nan", "---", "--.-", "--"]
 
-        def data_parser(date):
-            if date is np.nan:
-                return None
-            else:
-                return datetime.datetime.strptime(date, "%d.%m.%Y %H:%M:%S")
-
         data: pd.DataFrame = pd.read_csv(file, parse_dates=[1], na_values=na_values, low_memory=False,
-                                         date_parser=None if is_iso8601 else data_parser)
+                                         date_parser=None if is_iso8601 else LegacyImport._data_parser)
 
         data.set_index("datetime", inplace=True)
         if remove_duplicit_index:  # index se odstraní až když je "datetime" indexem
             LegacyImport._drop_dupe_index(data)
 
         # lokalizace time zone
-        data = data.tz_localize("Europe/Prague", ambiguous=ambiguous_localize, nonexistent="shift_forward")
+        data = data.tz_localize(time_zone, ambiguous=ambiguous_localize, nonexistent="shift_forward")
         if dropna_index:
             data = data[data.index.notna()]
 
         if drop:
             data = data[["out_temp", "out_humidity", "dew_point", "wind_speed", "wind_dir", "gust", "bar", "day_rain"]]
 
-        data.rename({"day_rain": "rain"}, axis=1, inplace=True)
+        data.rename({"day_rain": "rain_data"}, axis=1, inplace=True)
         return data
 
     @staticmethod
-    def conv2012(inp="2012.csv") -> pd.DataFrame:
+    def conv2012(inp="2012.csv", is2012: bool = True) -> pd.DataFrame:
         """
-        Tato funkce dokáže vzít formát data z roku 2012 a převést jej na
+        Tato funkce dokáže vzít formát data *nejen* z roku 2012 a převést jej na
         `ISO 8601 <https://en.wikipedia.org/wiki/ISO_8601>`_.
 
         Args:
+            is2012: formát data roku 2012 je trochu jiný než oproti roku 2018, tento parametr existuje v rámci zachování
+                kompatibility mezi oběma soubory
             inp: jméno souboru k úpravě
 
         Returns:
             DataFrame se správným formátem datu
         """
-        df = pd.read_csv(inp, parse_dates=["datetime"])
+
+        def data_parser_additional(date):
+            if date is np.nan:
+                return None
+            else:
+                return datetime.datetime.strptime(date, "%d.%m.%Y %H:%M")
+
+        df = pd.read_csv(inp, parse_dates=["datetime"],
+                         date_parser=LegacyImport._data_parser if is2012 else data_parser_additional)
         return df
 
     @staticmethod
@@ -252,3 +341,10 @@ class LegacyImport:
             data: odstranit data z tohoto DataFrame
         """
         data.drop(index=data[data.index.duplicated()].index, inplace=True)
+
+    @staticmethod
+    def _data_parser(date):
+        if date is np.nan:
+            return None
+        else:
+            return datetime.datetime.strptime(date, "%d.%m.%Y %H:%M:%S")

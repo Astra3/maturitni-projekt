@@ -18,3 +18,12 @@ Soubor Pocasi.core.imp
    :undoc-members:
    :show-inheritance:
    :private-members:
+
+Soubor Pocasi.core.request
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: Pocasi.core.request
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:

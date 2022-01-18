@@ -10,10 +10,12 @@ rainfall = old.rainfall(True)
 
 new = EditData(df_new)
 rain = EditData(rainfall)
-rain.combine(new.rainfall(drop_rain=False))
+rain.combine(new.rainfall())
 new.combine(old.df)
+new.filter_unrealistic_data()
+rain.df.index.rename("datetime", inplace=True)
 
 df = new.df
 rainfall = rain.df
 # new.to_feather()
-# rain.to_feather()
+# rain.to_feather(True)

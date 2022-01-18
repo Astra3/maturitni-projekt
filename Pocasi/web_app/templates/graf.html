@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {{ cdn|safe }}
+    <meta charset="UTF-8">
+    <title>Graf</title>
+</head>
+<body>
+<div id="teplota">
+    
+</div>
+<script>
+    fetch('/graphRend')
+        .then(function (response) {
+            return response.json()
+        })
+        .then(function (item) {
+            return Bokeh.embed.embed_item(item)
+        })
+</script>
+</body>
+</html>

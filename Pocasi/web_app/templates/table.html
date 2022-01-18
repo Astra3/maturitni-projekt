@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tabulka dat</title>
+</head>
+<body>
+<table>
+    <tr>
+        <th>Index</th>
+        {% for key in data.keys() %}
+            <th>{{ key }}</th>
+        {% endfor %}
+    </tr>
+    {% for row, index in zip(data.values, data.index) %}
+        <tr>
+            <td>{{ index }}</td>
+            {% for value in row %}
+                <td>{{ value }}</td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+</table>
+</body>
+</html>
