@@ -9,7 +9,7 @@ from pocasi.web_app import bcrypt
 class LoginForm(FlaskForm):
     """Přihlašovací formulář."""
 
-    password = PasswordField("Heslo", validators=[DataRequired()])
+    password = PasswordField("Heslo", validators=[DataRequired()], render_kw={'autofocus': True})
     remember = BooleanField("Zapamatovat přihlášení?", default=True)
     submit = SubmitField("Přihlásit")
 

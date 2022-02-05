@@ -54,6 +54,8 @@ def import_data():
         try:
             with ImportSave() as imp:
                 imp.import_append(temp_file_path)
+            flash("Soubor úspěšně nahrán!", "success")
+            flash("Je vyžadován restart aplikace pro provedení změn!", "warning")
         except FileInvalidError:
             flash("Nahraný soubor byl neplatný!", "danger")
     return render_template("request/import_form.html", form=form, title="Import dat")

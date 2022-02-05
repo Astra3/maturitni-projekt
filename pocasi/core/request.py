@@ -92,12 +92,12 @@ class DataRequest:
         # Přidá následující časy do data a seřadí index
         times = [14, 21]
         for i in times:
-            data = data.append(request.at_time(datetime.time(i + time_offset)))
+            data = pd.concat([data, (request.at_time(datetime.time(i + time_offset)))])
         data.sort_index(inplace=True)
 
         # Přidá poslední hodnotu z times k teplotě a spočítá denní průměry teplot
         temp_means: pd.Series = data.loc[:, "out_temp"]
-        temp_means = temp_means.append(request.out_temp.at_time(datetime.time(times[-1] + time_offset)))
+        temp_means = pd.concat([temp_means, (request.out_temp.at_time(datetime.time(times[-1] + time_offset)))])
         temp_means = temp_means.resample("D").mean()
         temp_means.rename("temp_means", inplace=True)
         # Odstraní informace o časové zóně

@@ -19,7 +19,6 @@ def login():
     """Stránka s přihlášením."""
     form = LoginForm()
     if form.validate_on_submit():
-        print(form.remember.data)
         login_user(User(), remember=form.remember.data)
         flash("Úspěšně přihlášen!", "success")
 

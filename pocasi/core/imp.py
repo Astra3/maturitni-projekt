@@ -50,6 +50,7 @@ def data_imp(inp="PathLike[str]", drop: bool = True) -> pd.DataFrame:
             return None
 
     # StringIO vlastně převede string na file stream
+    # noinspection PyTypeChecker
     df = pd.read_csv(StringIO(data), sep="\t", parse_dates=[0], date_parser=date_parser, na_values=["---", "------"])
 
     df.set_index("datetime", inplace=True)
@@ -210,8 +211,8 @@ class EditData:
 class ImportSave:
     """Jednoduchý import a uložení.
 
-    Tato třída umí jednoduše naimportovat data ze souboru, převést je databáze, přidat je a uložit. Měla by být výhradně
-    použita v rámci context manageru.
+    Tato třída umí jednoduše naimportovat data ze souboru, převést je databáze, přidat je a uložit. Rovněž vytvoří
+    zálohy starých dat. Měla by být výhradně použita v rámci context manageru.
 
     Raises:
         ValueError: Pokud se nenaleznou buď data srážek, nebo počasí - pokud neexistuje ani jedno, tak jsou automaticky
@@ -247,7 +248,21 @@ class ImportSave:
         self.pocasi.filter_unrealistic_data()
 
     def close(self) -> None:
-        """Uloží data do jejich příslušných formátů, pokud spuštěno přes ``with`` keyword, spustí se automaticky."""
+        """Uloží data do jejich příslušných formátů, pokud spuštěno přes ``with`` keyword, spustí se automaticky.
+        Taky vytvoří zálohu předešlých dat.
+        """
+        files = [data_path, rain_path]
+        temp_files = [f"{data_path}.bak", f"{rain_path}.bak"]
+        # Odstraní současné zálohy
+        for temp_path in temp_files:
+            if os.path.isfile(temp_path):
+                os.remove(temp_path)
+
+        # Přidá k současným souborům .bak příponu
+        for path, temp_path in zip(files, temp_files):
+            os.rename(path, temp_path)
+
+        # Uloží nové .feather soubory
         self.rain.to_feather(True)
         self.pocasi.to_feather()
 
