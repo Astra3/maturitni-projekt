@@ -1,0 +1,22 @@
+{% extends "template.html" %}
+{% block content %}
+    <div class="container-fluid">
+        <div class="col-md-6">
+            <form method="post" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                {{ form.file.label(class="form-label") }}
+                {% if form.file.errors %}
+                    {{ form.file(class="form-control is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.file.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.file(class="form-control") }}
+                {% endif %}
+                {{ form.submit(class="btn btn-primary mt-2") }}
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -14,3 +14,4 @@ Podbalíčky
    :maxdepth: 4
 
    Pocasi.core
+   Pocasi.web_app

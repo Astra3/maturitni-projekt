@@ -1,0 +1,95 @@
+<!--suppress JSUnusedAssignment, JSDuplicatedDeclaration -->
+<script>
+    const form_submit = function () {
+        $("#input").on("submit", function () {
+            let end
+            let start = $("#origStart").prop("checked") ? "" : $("#start").val();
+
+            const loading = $("#loading");
+            const frame = $("#frame")
+
+            if ($("#oneDayMode").prop("checked")) {
+                end = start
+            } else {
+                end = $("#origEnd").prop("checked") ? "" : $("#end").val();
+                const startDate = new Date(start)
+                const endDate = new Date(end)
+                const day_limit = {{ day_limit }};
+                let result = (endDate.getTime() - startDate.getTime()) / 1000 / 3600 / 24
+                if (result > day_limit && day_limit > 0) {
+                    {# alert při přesáhnutí limitu dnů #}
+                    if (!confirm(`Délka ve dnech (${result} dní) přesahuje maximální doporučenou délku, ${day_limit} dní.\nPři pokračování může žádost zabrat hodně času a prohlížeč si vezme hodně paměti.\nPokračujte na VLASTNÍ RIZIKO!`)) {
+                        return false;
+                    }
+                }
+            }
+            {# vyčistí frame s daty z předchozího requestu #}
+            frame.empty()
+            {# zobrazí loading kolečko #}
+            loading.prop("hidden", false)
+
+            {% if is_graph %}
+
+                const values = {{ dropdown | safe }}
+                // noinspection JSJQueryEfficiency
+                const index = $("#dropdown").val()
+                frame.css("height", "60vh")
+                $.ajax({
+                    url: "{{ url_for('render.render_graf') }}",
+                    data: {
+                        type: values[index],
+                        start: start,
+                        end: end
+                    },
+                    type: "GET",
+                    dataType: "json"
+                })
+                    .done(function (data) {
+                        Bokeh.embed.embed_item(data, "frame")
+                    })
+                    .fail(function () {
+                        alert("Na serveru se stala chyba!")
+                    })
+                    .always(function () {
+                        loading.prop("hidden", true)
+                    })
+            {% else %}
+                // noinspection JSJQueryEfficiency
+                $.ajax({
+                    {% if is_table %}
+                        url: "{{ url_for('render.render_table') }}",
+                        data: {
+                            type: $("#dropdown").val(),
+                            start: start,
+                            end: end
+                        },
+                        type: "GET",
+                        dataType: "html"
+                    {% else %}
+                        url: "{{ url_for('render.render_summary') }}",
+                        data: {
+                            start: start,
+                            end: end
+                        },
+                        type: "GET",
+                        dataType: "html"
+                    {% endif %}
+                })
+                    .done(function (data) {
+                        frame.html(data)
+                    })
+                    .fail(function () {
+                        alert("Na serveru se stala chyba!")
+                    })
+                    .always(function () {
+                        loading.prop("hidden", true)
+                    })
+            {% endif %}
+
+            return false;
+        })
+    }
+    $(document).ready(function () {
+        form_submit()
+    })
+</script>

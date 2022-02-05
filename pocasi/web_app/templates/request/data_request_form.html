@@ -1,0 +1,144 @@
+{% extends "template.html" %}
+{% set start_text = "Počáteční datum" %}
+{% block content %}
+    <script>
+        const toggle_disabled = function (idx, oldProp) {
+            return !oldProp
+        }
+        const form_inp_toggle = function () {
+            const start = $("#start");
+            const origStart = $("#origStart")
+
+            const end = $("#end")
+            const origEnd = $("#origEnd")
+
+            const loading = $("#loading")
+
+            origStart.on("change", function () {
+                start.prop("disabled", toggle_disabled);
+            });
+
+            origEnd.on("change", function () {
+                end.prop("disabled", toggle_disabled);
+            });
+
+            $("#oneDayMode").on("change", function () {
+                $("#endDate").toggle(200)
+                $("#startCheck").toggle(200)
+                {# pokud je zaškrtnuté origEnd, pouze jej odškrtne, pokud ne, udělá toggle na stavu kalendáře #}
+                if (origEnd.prop("checked")) {
+                    origEnd.prop("checked", false)
+                } else {
+                    end.prop("disabled", toggle_disabled)
+                }
+                if ($(this).prop("checked")) {
+                    $("#startLabel").text("Zadejte datum")
+                    start.prop("max", "{{ max_date }}")
+                    end.val("")
+                } else {
+                    $("#startLabel").text("{{ start_text }}")
+                }
+            })
+
+            {# nastaví max a min čas on the fly při psaní elementů #}
+            const min_date = new Date("{{ min_date }}").getTime()
+            const max_date = new Date("{{ max_date }}").getTime()
+            start.on("focusout", function () {
+                const date = new Date($(this).val()).getTime()
+                if (date >= min_date && date <= max_date) {
+                    end.prop("min", $(this).val())
+                }
+            })
+            end.on("focusout", function () {
+                const date = new Date($(this).val()).getTime()
+                if (date >= min_date && date <= max_date) {
+                    start.prop("max", $(this).val())
+                }
+            })
+        }
+        $(document).ready(function () {
+            form_inp_toggle()
+        })
+    </script>
+    {% include "js/js_request.html" %}
+    {% if is_graph %}
+        {{ cdn | safe }}
+    {% endif %}
+    <div class="container-fluid mb-2">
+        <form id="input">
+            <div class="row my-2" {% if is_graph %} hidden {% endif %}>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="oneDayMode">
+                    <label class="form-check-label" for="oneDayMode">
+                        Režim jednoho dne
+                    </label>
+                </div>
+            </div>
+            <div class="row mb-2">
+                {% block dropdown %}{% endblock %}
+                <div class="col-md-4 mb-2 mb-md-0">
+                    <label for="start" class="form-label" id="startLabel">{{ start_text }}</label>
+                    <input type="date" class="form-control" id="start" placeholder="Počáteční datum" required
+                           min="{{ min_date }}" max="{{ max_date }}" value="{{ min_date }}">
+
+                    <div class="form-check" id="startCheck">
+                        <input class="form-check-input" type="checkbox" id="origStart">
+                        <label class="form-check-label" for="origStart">
+                            Začít od začátku databáze?
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-2 mb-md-0" id="endDate">
+                    <label for="end" class="form-label">Konečné datum</label>
+                    <input type="date" class="form-control" id="end" placeholder="Konečné datum" required
+                           min="{{ min_date }}" max="{{ max_date }}" value="{{ max_date }}">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="origEnd">
+                        <label class="form-check-label" for="origEnd">
+                            Až do konce databáze?
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md">
+                    <button type="submit" class="btn btn-primary">Vypsat data</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    {% if is_graph %}
+        <details>
+            <summary>Nápověda k ovládání</summary>
+            <h5>Stolní počítače</h5>
+            <ul>
+                <li>Pro změnu velikosti použijte nástroj vpravo, pojmenovaný "Wheel
+                    Zoom"
+                </li>
+                <li>Po jeho aktivaci lze i měnit měřítko osy, stačí na ni najet a točit
+                    kolečkem
+                </li>
+                <li>Při táhnutí myší po ose se bude posouvat jen ta daná
+                    osa
+                </li>
+            </ul>
+
+            <h5>Dotykové zařízení</h5>
+            <ul>
+                <li>Pro posouvání stránky v oblasti grafu použijte dva
+                    prsty
+                </li>
+                <li>Pro změnu velikosti grafu použijte nástroj "Wheel Zoom" a poté dva prsty pro
+                    přiblížení
+                </li>
+            </ul>
+            <i>Poznámka:</i> Ačkoliv lze nastavit jednodenní graf, většinou se nezobrazí žádná hodnota.
+        </details>
+    {% endif %}
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border" role="status" id="loading" hidden>
+            <span class="visually-hidden">Načítání...</span>
+        </div>
+    </div>
+    <div id="frame"></div>
+{% endblock %}

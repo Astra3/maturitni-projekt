@@ -30,7 +30,7 @@ jako `.csv` oddělené tabulátory. V dropdown oknu pod odstavcem se nachází u
 % @formatter:on
 
 Skoro každý soubor mezi roky 2011 a 2018 je uložen v `.txt` formátu ve stejném, jako je zmíněný výše. Výjimku tvoří rok
-2012 (viz {ref}`Rok 2012`) a prosinec 2018 (viz {ref}`Hlavičky textu`).
+2012 (viz {ref}`import_dat/old_import:Rok 2012`) a prosinec 2018 (viz {ref}`import_dat/old_import:Hlavičky textu`).
 :::
 
 Jak lze vidět, daným datům chybí i hlavička. Nicméně díky tomu, že jsou data konzistentní (kromě roku 2018, o něm
@@ -50,11 +50,11 @@ formát na data.
 % @formatter:on
 
 Rok 2018 je v datech zapsaný jinak, veškeré data až do půlky prosince jsou v `.txt` souborech. Nicméně druhá půlka
-prosince je v Excel souboru. Tento problém se řeší stejně, jako {ref}`Excel formát`. Tato část prosince má rovněž jinou
-hlavičku (viz kapitola {ref}`Hlavičky textu`). {ref}`Červen roku 2015` je kombinace mezinárodního formátu data a
-místního.
+prosince je v Excel souboru. Tento problém se řeší stejně, jako {ref}`import_dat/old_import:Excel formát`. Tato část
+prosince má rovněž jinou hlavičku (viz kapitola {ref}`import_dat/old_import:Hlavičky textu`).
+{ref}`import_dat/old_import:Červen roku 2015` je kombinace mezinárodního formátu data a místního.
 
-Rovněž také pozor na rok 2012 (viz {ref}`Rok 2012`) a červen roku 2015.
+Rovněž také pozor na rok 2012 (viz {ref}`import_dat/old_import:Rok 2012`) a červen roku 2015.
 :::
 
 ### Červen roku 2015
@@ -72,7 +72,8 @@ datech nastat následující situace:
 
 Data zde se ukazují, jako že jsou v lednu, v reálu hodnoty s pozitivní teplotou jsou v červnu. Formát dat vypadá
 následovně `2015-01-07` pro leden a `1.7.2015` pro červen. Stejně jako u zapeklité situace s
-{ref}`rokem 2012 <Rok 2012>`, rovněž i zde můžeme použít metodu {meth}`Pocasi.core.imp.LegacyImport.conv2012`.
+{ref}`rokem 2012 <import_dat/old_import:Rok 2012>`, rovněž i zde můžeme použít metodu
+{meth}`Pocasi.core.imp.LegacyImport.conv2012`.
 
 ## Excel formát
 
@@ -143,11 +144,12 @@ tvoří rok 2012.
 Celý rok 2012 je uložen jako Excel tabulka. To samo o sobě by nebyl problém, problém je, že tento rok používá místní
 datový formát, stejně jako všechny ostatní Excel dokumenty. Nicméně jelikož se tento soubor nachází mezi spousty `.txt`
 a sdílí s nimi i formát hlavičky, je zde porušena konzistence data (porušení bodu 5 v
-{ref}`Pravidlech pro správný import <Pravidla pro správný import dat>`). Nejprve je třeba tyhle data odděleně
-naimportovat a exportovat s jiným formátem data. Víceméně udělat něco na zkombinovaný dataset následujícího:
+{ref}`Pravidlech pro správný import <import_dat/správný_import:Pravidla pro správný import dat>`). Nejprve je třeba
+tyhle data odděleně naimportovat a exportovat s jiným formátem data. Víceméně udělat něco na zkombinovaný dataset
+následujícího:
 
 **Před provedením následující operace je třeba přidat do importovaného souboru hlavičku, více info v kapitole
-{ref}`Hlavičky textu`!**
+{ref}`import_dat/old_import:Hlavičky textu`!**
 
 ```pycon
 >>> import pandas as pd

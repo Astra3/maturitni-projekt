@@ -10,6 +10,15 @@ Balíček  Pocasi.core
 Podsoubory
 ----------
 
+Soubor Pocasi.core.export
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: Pocasi.core.export
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :private-members:
+
 Soubor Pocasi.core.imp
 ~~~~~~~~~~~~~~~~~~~~~~
 

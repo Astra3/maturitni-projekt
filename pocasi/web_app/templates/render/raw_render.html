@@ -1,0 +1,50 @@
+<table class="table table-hover table-bordered table-striped" id="tabulka" hidden>
+    <thead>
+    <tr>
+        {% if is_rain %}
+            <th scope="col">Datum</th>
+        {% else %}
+            <th scope="col">Datum a čas</th>
+        {% endif %}
+        {% for column in table_index %}
+            <th scope="col">{{ column }}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+    {% for _, row in table.iterrows() %}
+        <tr>
+            {# dalo by se technicky vzato změnit na vypsání pouze datumu, tohle funguje lépe s DataTables ale #}
+            {% if is_rain %}
+                <th scope="row">{{ row.name.date() }}</th>
+            {% else %}
+                <th scope="row">{{ row.name.date() }} {{ row.name.time() }}</th>
+            {% endif %}
+            {% for item in row.values %}
+                {% if item | string == "nan" or item | string == "None" %}
+                    {% set item = "" %}
+                {% endif %}
+                <td>{{ item }}</td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<script>
+    $(document).ready(function () {
+        $("#tabulka").DataTable({
+            {# přeložit: https://www.datatables.net/extensions/searchbuilder/examples/customisation/language.html #}
+            dom: 'QBlfrtip',
+            colReorder: true,
+            initComplete: function () {
+                $("#tabulka").wrap("<div class='table-responsive'></div>").prop("hidden", false);
+            },
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ],
+            language: {
+                url: "//cdn.datatables.net/plug-ins/1.11.4/i18n/cs.json"
+            }
+        })
+    })
+</script>

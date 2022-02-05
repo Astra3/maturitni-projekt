@@ -5,11 +5,12 @@ automaticky přes skript.
 
 ## Jak to funguje
 
-Nový formát nesplňuje několik bodů pro {ref}`správný import dat <Pravidla pro správný import dat>`, jmenovitě datum,
-časovou zónu a hlavičku ve dvou řádcích. Celý skript funguje tak, že hlavičku nejprve odstraní a poté přidá vlastní
-hlavičku přizpůsobenou ostatním, starším formátům. Poté se odstraní druhý tabulátor z každého řádku, to zapříčiní
-spojení data a času dohromady. Pak se samozřejmě ještě převede formát časového údaje do time-zone aware. **Celý formát
-používá tabulátory!**
+Nový formát nesplňuje několik bodů pro
+{ref}`správný import dat <import_dat/správný_import:Pravidla pro správný import dat>`, jmenovitě datum, časovou zónu a
+hlavičku ve dvou řádcích. Celý skript funguje tak, že hlavičku nejprve odstraní a poté přidá vlastní hlavičku
+přizpůsobenou ostatním, starším formátům. Poté se odstraní druhý tabulátor z každého řádku, to zapříčiní spojení data a
+času dohromady. Pak se samozřejmě ještě převede formát časového údaje do time-zone aware. **
+Celý formát používá tabulátory!**
 
 Formát hlavičky *(`\t` funguje jako tabulátor)*:
 
@@ -21,7 +22,7 @@ datetime\tout_temp\thi_out_temp\tlow_out_temp\tout_humidity\tdew_point\twind_spe
 
 Tohle je podstatně jednodušší oproti starému formátu. Opět zde je kontrola, zda daný soubor vůbec existuje. Nakonec se
 tento soubor otevře, do proměnné se načtou všechny jeho řádky a první dva se odstraní. Jsou nahrzeny indexem pro data
-zmíněným v části {ref}`Jak to funguje`.
+zmíněným v části {ref}`import_dat/současný_import:Jak to funguje`.
 
 Dále se použije parser dat pro lokální časový formát a celá proměnná se dá, za pomocí StringIO do `pandas` přes
 {doc}`pandas:reference/api/pandas.read_csv` metodu.

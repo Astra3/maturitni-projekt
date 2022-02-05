@@ -22,7 +22,7 @@ add_line = ClassDocumenter.add_line
 line_to_delete = _(u'Bases: %s') % u':class:`object`'
 
 
-# tohle je prostě rychle udělaný patch zkopírovaný odsud:
+# Tohle je prostě rychle udělaný patch zkopírovaný odsud:
 # https://stackoverflow.com/questions/46279030/how-can-i-prevent-sphinx-from-listing-object-as-a-base-class
 def add_line_no_object_base(self, text, *args, **kwargs):
     if text.strip() == line_to_delete:
@@ -60,7 +60,7 @@ def data_import(inp="../data_import.py"):
 
 project = 'Prohlížeč dat počasí'
 # noinspection PyShadowingBuiltins
-copyright = '2021, Roman Táborský'
+copyright = '2022, Roman Táborský'
 author = 'Roman Táborský'
 
 # -- General configuration ---------------------------------------------------
@@ -71,7 +71,7 @@ author = 'Roman Táborský'
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosectionlabel",
-    "sphinx.ext.intersphinx",  # je použité v některých docstrings
+    "sphinx.ext.intersphinx",  # Je použité v některých docstrings
     "myst_parser",
     "sphinx.ext.napoleon",
     "sphinx_copybutton",
@@ -88,6 +88,8 @@ myst_enable_extensions = [
 myst_substitutions = {
     "data_import": data_import()
 }
+
+autosectionlabel_prefix_document = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

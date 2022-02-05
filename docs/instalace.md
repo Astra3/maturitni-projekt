@@ -14,7 +14,7 @@ souboru s balíčky pro ostatní vývojáře.
 
 Prvním krokem je založit si venv (virtual environment). Jako u každého jiného Python projektu, založení venv není
 nezbytným krokem, nicméně ulehčí organizaci balíčků nainstalovaných přes `pip`. Pokud si přejete přeskočit tuhle pasáž a
-místo toho pracovat v systémovém prostředí, přeskočte na sekci {ref}`Instalace balíčků<Instalace balíčků>`.
+místo toho pracovat v systémovém prostředí, přeskočte na sekci {ref}`instalace:Instalace balíčků`.
 
 `venv` založíme ve složce naší volby, preferovaně se ale používá složka "venv". Vytváří se následovně:
 

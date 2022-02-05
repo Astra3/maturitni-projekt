@@ -1,0 +1,13 @@
+{% extends "request/data_request_form.html" %}
+{% block dropdown %}
+    <div class="col-md-4 mb-2 mb-md-0">
+        <label for="dropdown" class="form-label">
+            Možnosti
+        </label>
+        <select class="form-select" aria-label="Možnosti" id="dropdown">
+            {% for num, name in enumerate(dropdown) %}
+                <option value="{{ num }}">{{ name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+{% endblock %}

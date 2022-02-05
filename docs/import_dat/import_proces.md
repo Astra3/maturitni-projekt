@@ -19,8 +19,8 @@ K tomuhle slouží funkce {func}`imp <Pocasi.core.imp.imp>`. Je v ní popsané, 
 
 Objekt třídy {class}`EditData <Pocasi.core.imp.EditData>` má metodu pro uložení do feather formátu,
 {meth}`to_feather <Pocasi.core.imp.EditData.to_feather>`. V příkladě uvedeném v kapitole
-{ref}`Kód k importu dat ze stanice` lze v posledních dvou zakomentovaných řádcích vidět, jak je použít v kontextu daného
-procesu importu.
+{ref}`import_dat/import_proces:Kód k importu dat ze stanice` lze v posledních dvou zakomentovaných řádcích vidět, jak je
+použít v kontextu daného procesu importu.
 
 ### Popis funkce exportu a importu
 

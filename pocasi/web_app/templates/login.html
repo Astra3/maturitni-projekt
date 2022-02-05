@@ -1,0 +1,28 @@
+{% extends "template.html" %}
+{% block content %}
+    <div class="container-fluid">
+        <div class="col-md-6">
+            <form method="post">
+                {{ form.hidden_tag() }}
+                {{ form.password.label(class="form-label") }}
+
+                {% if form.password.errors %}
+                    {{ form.password(class="form-control is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.password.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.password(class="form-control") }}
+                {% endif %}
+                <div class="form-check mt-1">
+                    {{ form.remember(class="form-check-input") }}
+                    {{ form.remember.label(class="form-check-label") }}
+                </div>
+
+                {{ form.submit(class="btn btn-primary mt-2") }}
+            </form>
+        </div>
+    </div>
+{% endblock %}
