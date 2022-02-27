@@ -58,6 +58,6 @@ data do Pandas datetime formátu.
 ## Metoda `rainfall`
 
 ```{eval-rst}
-..  automethod:: Pocasi.core.imp.EditData.rainfall
+..  automethod:: pocasi.core.imp.EditData.rainfall
     :noindex:
 ```

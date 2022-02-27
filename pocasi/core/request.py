@@ -1,7 +1,6 @@
 """Soubor obsahující funkce pro dotazy z databáze."""
 import datetime
 from datetime import date
-from typing import Tuple, List
 
 import pandas as pd
 from bokeh.models import HoverTool
@@ -33,7 +32,7 @@ class DataRequest:
             raise KeyError(f"Špatně zadaný index, parametr start ({start}) je větší než end ({end})")
 
     def daily_summary(self, time_offset: int = -1) -> \
-            Tuple[pd.DataFrame, pd.Series, List[DatetimeIndexResampler], pd.Series]:
+            tuple[pd.DataFrame, pd.Series, list[DatetimeIndexResampler], pd.Series]:
         """Metoda vracející denní souhrny dat o počasí.
 
         Vrací denní průměrnou teplotu počítanou v 7:00, 14:00 a 21:00 (dvakrát),

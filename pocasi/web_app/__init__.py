@@ -3,10 +3,16 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 
 from pocasi import pocasi_data
+
+secret_key_env_var = "POCASI_APLIKACE_WEB"
 from pocasi.web_app.config import Config
 
-max_date = str(pocasi_data.iloc[-1].name.date())
-min_date = str(pocasi_data.iloc[0].name.date())
+if pocasi_data is not None:
+    max_date = str(pocasi_data.iloc[-1].name.date())
+    min_date = str(pocasi_data.iloc[0].name.date())
+else:
+    max_date = None
+    min_date = None
 
 bcrypt = Bcrypt()
 

@@ -1,5 +1,18 @@
+from os import getenv
+
+import click
+
+token = getenv("POCASI_APLIKACE_WEB")
+if token is None:
+    click.secho("VAROVÁNÍ!", fg="red", bold=True)
+    click.secho("Environment variable 'POCASI_APLIKACE_WEB' nebyla nastavena, nastavuji výchozí hodnotu!\n"
+                "Pokud neplánujete použít během tohoto spuštění webové rozhraní, můžete tuto zprávu ignorovat.",
+                fg="red")
+    # noinspection SpellCheckingInspection
+    token = "99dffb7a12f77ede47a83175bc0c430b0d35939a4d705eadfe5039ca0ab5cd9e"
+
+
 class Config:
-    # Tohle by samozřejmě mělo být ideálně v environment variable, pro účely lehčího testování není.
     # Tento token je důležitý z důvodu bezpečnosti, jeho únik by mohl vytvořit bezpečnostní díry za pomocí cookies v
     # login systému a formulářích. Jinými slovy zabraňuje CSRF.
-    SECRET_KEY = "6cd39e51fe54aa7d47da9b7f6c82d1a0"
+    SECRET_KEY = token

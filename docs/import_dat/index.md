@@ -9,5 +9,6 @@ správný_import
 old_import
 současný_import
 srážky
+trida_editdata
 import_proces
 ```

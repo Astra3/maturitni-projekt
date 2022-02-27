@@ -1,7 +1,7 @@
-Pocasi
+pocasi
 ======
 
 .. toctree::
    :maxdepth: 4
 
-   Pocasi
+   pocasi

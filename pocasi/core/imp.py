@@ -54,7 +54,7 @@ def data_imp(inp="PathLike[str]", drop: bool = True) -> pd.DataFrame:
     df = pd.read_csv(StringIO(data), sep="\t", parse_dates=[0], date_parser=date_parser, na_values=["---", "------"])
 
     df.set_index("datetime", inplace=True)
-    df = df.tz_localize(time_zone, ambiguous="infer")
+    df = df.tz_localize(time_zone, ambiguous=False)
     if drop:
         df = df[["out_temp", "out_humidity", "dew_point", "wind_speed", "wind_dir", "gust", "bar", "rain_data"]]
         df = df.loc[df.index.dropna()]
@@ -94,7 +94,7 @@ class EditData:
     def combine(self, df_append: pd.DataFrame | pd.Series) -> pd.DataFrame:
         """Metoda kombinující dohromady zadaný DataFrame, seřadí index a **odstraní duplicitní index**.
 
-        Příklad použití::
+        Příklad použití:
 
         >>> dataframe = pd.DataFrame([[5, 2, 5, 2], [10, 2, 8, 2]])
         >>> dataframe
@@ -133,7 +133,7 @@ class EditData:
         self.df = self.df[~self.df.index.duplicated()]
         return df
 
-    def rainfall(self, old=False, drop_rain: bool = True, localize: bool = True) -> pd.Series:
+    def rainfall(self, old: bool = False, drop_rain: bool = True, localize: bool = True) -> pd.Series:
         """Metoda vracející Series s daty o denních srážkách.
 
         Metoda bere data ze sloupce "rain_data" z DataFrame inicializovaném v objektu této třídy. Více o funkci v
@@ -274,7 +274,7 @@ class ImportSave:
 
 
 class FileInvalidError(Exception):
-    """Chyba definující neplatný soubor, použitá v :class:`Pocasi.core.imp.ImportSave`."""
+    """Chyba definující neplatný soubor, použitá v :class:`pocasi.core.imp.ImportSave`."""
     pass
 
 

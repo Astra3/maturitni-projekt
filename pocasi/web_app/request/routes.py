@@ -1,5 +1,6 @@
 from tempfile import gettempdir
 
+import pandas.errors
 from bokeh.resources import CDN
 from flask import Blueprint, render_template, flash
 from flask_login import login_required
@@ -48,6 +49,7 @@ def import_data():
     if form.validate_on_submit():
         file_name = "pocasi_projekt.csv"
         file_data: str = form.file.data.read().decode()
+        print(form.file.data)
         temp_file_path = f"{gettempdir()}/{file_name}"
         with open(temp_file_path, "w") as f:  # Soubor se ukládá to temp directory
             f.write(file_data)
@@ -58,4 +60,6 @@ def import_data():
             flash("Je vyžadován restart aplikace pro provedení změn!", "warning")
         except FileInvalidError:
             flash("Nahraný soubor byl neplatný!", "danger")
+        except pandas.errors.ParserError as ex:
+            flash(f"Při nahrávání souboru se stala chyba! Text chyby: {ex}", "danger")
     return render_template("request/import_form.html", form=form, title="Import dat")

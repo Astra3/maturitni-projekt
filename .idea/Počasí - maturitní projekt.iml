@@ -21,6 +21,7 @@
     <orderEntry type="library" name="bootstrap-dark-5" level="application" />
     <orderEntry type="library" name="datatables" level="application" />
     <orderEntry type="library" name="pdfmake" level="application" />
+    <orderEntry type="library" name="jquery-3.6.0" level="application" />
   </component>
   <component name="PyDocumentationSettings">
     <option name="format" value="GOOGLE" />

@@ -30,7 +30,7 @@ jako `.csv` oddělené tabulátory. V dropdown oknu pod odstavcem se nachází u
 % @formatter:on
 
 Skoro každý soubor mezi roky 2011 a 2018 je uložen v `.txt` formátu ve stejném, jako je zmíněný výše. Výjimku tvoří rok
-2012 (viz {ref}`import_dat/old_import:Rok 2012`) a prosinec 2018 (viz {ref}`import_dat/old_import:Hlavičky textu`).
+2012 (viz {ref}`Rok 2012 <rok-2012>`) a prosinec 2018 (viz {ref}`import_dat/old_import:Hlavičky textu`).
 :::
 
 Jak lze vidět, daným datům chybí i hlavička. Nicméně díky tomu, že jsou data konzistentní (kromě roku 2018, o něm
@@ -52,15 +52,15 @@ formát na data.
 Rok 2018 je v datech zapsaný jinak, veškeré data až do půlky prosince jsou v `.txt` souborech. Nicméně druhá půlka
 prosince je v Excel souboru. Tento problém se řeší stejně, jako {ref}`import_dat/old_import:Excel formát`. Tato část
 prosince má rovněž jinou hlavičku (viz kapitola {ref}`import_dat/old_import:Hlavičky textu`).
-{ref}`import_dat/old_import:Červen roku 2015` je kombinace mezinárodního formátu data a místního.
+{ref}`import_dat/old_import:Červenec roku 2015` je kombinace mezinárodního formátu data a místního.
 
-Rovněž také pozor na rok 2012 (viz {ref}`import_dat/old_import:Rok 2012`) a červen roku 2015.
+Rovněž také pozor na rok 2012 (viz {ref}`Rok 2012 <rok-2012>`) a červen roku 2015.
 :::
 
-### Červen roku 2015
+### Červenec roku 2015
 
-Červen roku 2015 je z půlky napsaný v ISO 8601 a z menší, druhé půlky v místním časovém formátu. Při nezpracování může v
-datech nastat následující situace:
+Červenec roku 2015 je z půlky napsaný v ISO 8601 a z menší, druhé půlky v místním časovém formátu. Při nezpracování může
+v datech nastat následující situace:
 
 ```none
 2015-01-07 00:06:00    13.9
@@ -70,10 +70,9 @@ datech nastat následující situace:
 2015-01-07 00:26:00    13.4
 ```
 
-Data zde se ukazují, jako že jsou v lednu, v reálu hodnoty s pozitivní teplotou jsou v červnu. Formát dat vypadá
-následovně `2015-01-07` pro leden a `1.7.2015` pro červen. Stejně jako u zapeklité situace s
-{ref}`rokem 2012 <import_dat/old_import:Rok 2012>`, rovněž i zde můžeme použít metodu
-{meth}`Pocasi.core.imp.LegacyImport.conv2012`.
+Data zde se ukazují, jako že jsou v lednu, v reálu hodnoty s pozitivní teplotou jsou v červenci. Formát dat vypadá
+následovně `2015-01-07` pro leden a `1.7.2015` pro červenec. Stejně jako u zapeklité situace s
+{ref}`Rokem 2012 <rok-2012>`, rovněž i zde můžeme použít metodu {meth}`pocasi.core.imp.LegacyImport.conv2012`.
 
 ## Excel formát
 
@@ -139,17 +138,23 @@ Veškeré období mezi prosincem 2018 a březnem 2021 tvoří Excel tabulky s ko
 tvoří rok 2012.
 :::
 
-### Rok 2012
+(rok-2012)=
 
-Celý rok 2012 je uložen jako Excel tabulka. To samo o sobě by nebyl problém, problém je, že tento rok používá místní
-datový formát, stejně jako všechny ostatní Excel dokumenty. Nicméně jelikož se tento soubor nachází mezi spousty `.txt`
+### Rok 2012 a metoda {meth}`conv2012 <pocasi.core.imp.LegacyImport.conv2012>`
+
+Celý rok 2012 (a červenec roku 2015, více v kapitole {ref}`import_dat/old_import:Červenec roku 2015`) je uložen jako
+Excel tabulka. To samo o sobě by nebyl problém, problém je, že tento rok používá místní datový formát, stejně jako
+všechny ostatní Excel dokumenty. Nicméně jelikož se tento soubor nachází mezi spousty `.txt`
 a sdílí s nimi i formát hlavičky, je zde porušena konzistence data (porušení bodu 5 v
 {ref}`Pravidlech pro správný import <import_dat/správný_import:Pravidla pro správný import dat>`). Nejprve je třeba
 tyhle data odděleně naimportovat a exportovat s jiným formátem data. Víceméně udělat něco na zkombinovaný dataset
 následujícího:
 
-**Před provedením následující operace je třeba přidat do importovaného souboru hlavičku, více info v kapitole
-{ref}`import_dat/old_import:Hlavičky textu`!**
+:::{warning}
+
+Před provedením následující operace je třeba přidat do importovaného souboru hlavičku, více info v kapitole
+{ref}`import_dat/old_import:Hlavičky textu`!
+:::
 
 ```pycon
 >>> import pandas as pd
@@ -178,17 +183,9 @@ soubory. Hlavičky všech souborů vypadají tedy následovně:
 Pro zkopírování klikněte třikrát na danou hlavičku a pak použijte Ctrl+V.
 :::
 
-## Třída `LegacyImport`
-
-```{eval-rst}
-..  autoclass:: Pocasi.core.imp.LegacyImport
-    :members:
-    :noindex:
-```
-
 ## Postup programu při importu dat ze souborů
 
-Jak lze vidět, metoda {meth}`old_import <Pocasi.core.imp.LegacyImport.old_import>` má spoustu parametrů pro použití, a s
+Jak lze vidět, metoda {meth}`old_import <pocasi.core.imp.LegacyImport.old_import>` má spoustu parametrů pro použití, a s
 každým z nich se nakládá jinak. Nejprve funkce testuje, zda soubor zadaný do `file` vůbec existuje. Poté si funkce
 vytvoří proměnnou `na_values` s NaN definicemi, které jsem objevil při analýze dat.
 
@@ -198,20 +195,24 @@ proměnná, `low_memory` se dává na False kvůli lepšímu a příjemnějším
 buď dává stejnojmenná funkce inicializovaná dříve, nebo None, na základě parametru `is_iso8601`. Nakonec se datum
 nastaví jako index.
 
-Nyní je na řade převedení dat do timezone aware formátu, jako timezone se automaticky bere Europe/Prague. Poté se na
-základě parametru `remove_duplicit_index` odstraní duplicitní index dat za pomocí skryté metody
-{meth}`drop_dupe_index <Pocasi.core.imp.LegacyImport._drop_dupe_index>`.
+Nyní je na řade převedení dat do timezone aware formátu, jako timezone se automaticky bere Europe/Prague.
 
 Úplně na závěr se odstraní přebytečné, a pro tento projekt nezajímavé, data, sloupec "day_rain" se přejmenuje na "rain",
 jen kvůli konzistenci.
 
-% @formatter:off
 :::{warning}
-% @formatter:on
 
 Některé hodnoty se dávají na zpracování přímo modulu `pandas`. Na základě uživatelské chyby může program vyhodit
 výjimku.
 :::
+
+## Třída `LegacyImport`
+
+```{eval-rst}
+..  autoclass:: pocasi.core.imp.LegacyImport
+    :members:
+    :noindex:
+```
 
 [^1]: Odpověď se skriptem
 na [ask.libreoffice.org](https://ask.libreoffice.org/t/how-do-i-export-all-sheets-from-a-spreadsheet/12024/4)

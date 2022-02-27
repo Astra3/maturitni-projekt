@@ -14,7 +14,7 @@ from os import path
 data_path = "database.feather"
 rain_path = "rainfall.feather"
 time_zone = "Europe/Prague"
-# Při změně timezone věnujte pozornost i time_offset parametru u metody Pocasi.core.request.DataRequest.daily_summary
+# Při změně timezone věnujte pozornost i time_offset parametru u metody pocasi.core.request.DataRequest.daily_summary
 
 from pocasi.core.imp import imp
 
