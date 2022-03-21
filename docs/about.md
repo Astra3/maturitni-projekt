@@ -2,7 +2,7 @@
 
 ## Autor
 
-Program vytvořen Romanem Táborským jako maturitní projekt.
+Program vytvořen Romanem Táborským.
 
 ## Poděkování
 
@@ -15,4 +15,4 @@ za odstranění "Bases: `object`" textu z {ref}`APIdoc:API dokumentace`.
 Všichni contributors na následujících projektech: pandas, numpy, python, bokeh, Sphinx, myST, furo, Flask, flask-login a
 scipy.
 
-A nakonec, panu konzultantovi maturitní práce Lukáši Haplovi.
+A nakonec, panu konzultantovi práce Lukáši Haplovi.

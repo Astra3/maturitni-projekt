@@ -1,5 +1,5 @@
 """
-Export dat je nedokončená vlastnost programu z časových důvodů splnění deadline maturitní práce. V rámci splnění zadání
+Export dat je nedokončená vlastnost programu z časových důvodů splnění deadline práce. V rámci splnění zadání
 byl implementován jednoduchý export do csv.
 """
 from datetime import date
