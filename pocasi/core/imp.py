@@ -243,9 +243,9 @@ class ImportSave:
         if df.empty:
             raise FileInvalidError("Soubor se nezdá být platný!")
         edit = EditData(df)
+        edit.filter_unrealistic_data()
         self.rain.combine(edit.rainfall())
         self.pocasi.combine(edit.df)
-        self.pocasi.filter_unrealistic_data()
 
     def close(self) -> None:
         """Uloží data do jejich příslušných formátů, pokud spuštěno přes ``with`` keyword, spustí se automaticky.

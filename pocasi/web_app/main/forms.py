@@ -17,6 +17,7 @@ class LoginForm(FlaskForm):
         try:
             with open("heslo.txt", "r") as f:
                 hashed_password = f.readline()
+                hashed_password = hashed_password.strip()
             if not bcrypt.check_password_hash(hashed_password, entered_password.data):
                 raise ValidationError("Heslo není platné!")
         except FileNotFoundError:
