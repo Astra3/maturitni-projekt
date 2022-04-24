@@ -126,9 +126,28 @@ html_theme_options = {
     "announcement": "HTML dokumentace není zatím kompletně dokončená!",
 }
 
+latex_engine = "xelatex"
+latex_use_xindy = False
+latex_documents = [("index", "prace", project, author, "manual", False)]
+latex_elements = {
+    "preamble": r"""
+\usepackage{enumitem}
+\setlistdepth{99}
+""",
+    "fontpkg": r"""
+\setmainfont{Roboto Slab}
+\setsansfont{Roboto}
+\setmonofont{Roboto Mono Light}
+""",
+}
+# latex_toplevel_sectioning = "chapter"
+
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+rinoh_documents = [dict(doc='index',  # top-level file (index.rst)
+                        target='manual')]  # output file (manual.pdf)
 
 epub_show_urls = "no"

@@ -29,7 +29,9 @@ class DataRequest:
         except TypeError:
             raise TypeError("Parametry start a end nejsou datum!")
         if self.request.empty:
-            raise KeyError(f"Špatně zadaný index, parametr start ({start}) je větší než end ({end})")
+            raise KeyError(
+                f"DataFrame je prázdný! Možnou příčinou může být špatně zadaný index nebo pokud parametr start ({start}) "
+                f"je větší než end ({end})")
 
     def daily_summary(self, time_offset: int = -1) -> \
             tuple[pd.DataFrame, pd.Series, list[DatetimeIndexResampler], pd.Series]:

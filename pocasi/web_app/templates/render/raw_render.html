@@ -21,10 +21,11 @@
                 <th scope="row">{{ row.name.date() }} {{ row.name.time() }}</th>
             {% endif %}
             {% for item in row.values %}
-                {% if item | string == "nan" or item | string == "None" %}
-                    {% set item = "" %}
-                {% endif %}
-                <td>{{ item }}</td>
+                <td>
+                    {% if not (item is none or item | string == "nan") %}
+                        {{ item }}
+                    {% endif %}
+                </td>
             {% endfor %}
         </tr>
     {% endfor %}

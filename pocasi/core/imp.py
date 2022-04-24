@@ -238,6 +238,9 @@ class ImportSave:
 
         Args:
             file: Soubor **nového formátu**, ze kterého importovat.
+
+        Raises:
+            FileInvalidError: Výjimka je vyvolána, pokud je vstupní soubor neplatný nebo prázdný.
         """
         df = data_imp(file)
         if df.empty:

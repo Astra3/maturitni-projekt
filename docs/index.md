@@ -2,8 +2,6 @@
 
 Program sloužící ke zpracování a importu dat počasí, jak v GUI nebo CLI.
 
-## Funkce jako druhá dokumentace
-
 Doporučil bych pohlížet na tuhle HTML dokumentaci, jako na dokumentaci ve Wordu, akorát v HTML formě a bez limitů a
 pravidel, které normální dokumentace má. Tahle dokumentace bude mnohem více technická a předpokládá s větší znalostí
 problematiky. Také popisuje proces postupu programu.

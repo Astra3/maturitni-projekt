@@ -2,6 +2,17 @@
     <label for="filter" class="form-label">Filtr dat</label>
     <input type="text" class="form-control" id="filter" placeholder="Zadejte datum pro filtrování">
 </div>
+
+{% macro vypis(data) %}
+    {% if not (data is none or data | string == "nan") %}
+        {% if data is string %}
+            {{ data }}
+        {% else %}
+            {{ data | round(2) }}
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
 {# index tabulky je definovaný v render/routes.py, je sdílen mezi cestami na webu #}
 {% set accordion = [
                 ["Maximální teplota", "headingMaxTemp", "max_temp_", "°C"],
@@ -34,7 +45,7 @@
                             <tr>
                                 <th scope="row">{{ row.name.time() }}</th>
                                 {% for item in row.values %}
-                                    <td>{{ item }}</td>
+                                    <td>{{ vypis(item) }}</td>
                                 {% endfor %}
                             </tr>
                         {% endfor %}
@@ -53,7 +64,7 @@
                                             data-bs-target="#{{ strings[2] + date }}"
                                             aria-expanded="true"
                                             aria-controls="{{ strings[2] + date }}">
-                                        {{ strings[0] }}:&nbsp;<b>{{ maxx }}</b>{{ strings[3] | safe }}
+                                        {{ strings[0] }}:&nbsp;<b>{{ vypis(maxx) }}</b>{{ strings[3] | safe }}
                                     </button>
                                 </h2>
                                 <div id="{{ strings[2] + date }}" class="accordion-collapse collapse"
@@ -74,7 +85,7 @@
                                                     <tr>
                                                         <th scope="row">{{ row.name.time() }}</th>
                                                         {% for item in row.values %}
-                                                            <td>{{ item }}</td>
+                                                            <td>{{ vypis(item) }}</td>
                                                         {% endfor %}
                                                     </tr>
                                                 {% endfor %}
@@ -105,11 +116,11 @@
                     <tbody>
                     <tr>
                         <th scope="row">{{ date }}</th>
-                        <td>{{ temp_mean | round(2) }}</td>
+                        <td>{{ vypis(temp_mean) }}</td>
                         {% for val in max_values %}
-                            <td>{{ val }}</td>
+                            <td>{{ vypis(val) }}</td>
                         {% endfor %}
-                        <td>{{ daily_rain.rain_data | round(2) }}</td>
+                        <td>{{ vypis(daily_rain.rain_data) }}</td>
                     </tr>
                     </tbody>
                 </table>
