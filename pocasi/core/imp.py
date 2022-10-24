@@ -71,7 +71,7 @@ def imp(rain: bool = False) -> pd.DataFrame:
     Returns:
         DataFrame počasí z Feather formátu.
     """
-    df = pd.read_feather(rain_path) if rain else pd.read_feather(data_path)
+    df = pd.read_feather(rain_path if rain else data_path)
     df.set_index("datetime", inplace=True)
 
     return df
