@@ -82,7 +82,7 @@ class DataRequest:
         max_min_values = [i.resample("D") for i in max_min_values]
 
         # Udělá resample na dny pro všechny hodnoty, bere jen jednu mezeru mezi hodnotami
-        request = request.resample("H").nearest(1)
+        request = request.resample("H").ffill(1)
 
         # Hodnoty se vybírají jen podle GMT+1, čili se vše převede do UTC a z časů se pak odečítá jedna hodina
         request = request.tz_convert("UTC")
