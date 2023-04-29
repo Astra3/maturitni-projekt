@@ -51,7 +51,18 @@ def data_imp(inp="PathLike[str]", drop: bool = True) -> pd.DataFrame:
 
     # StringIO vlastně převede string na file stream
     # noinspection PyTypeChecker
-    df = pd.read_csv(StringIO(data), sep="\t", parse_dates=[0], date_parser=date_parser, na_values=["---", "------"])
+    dtypes = {
+        "out_temp": np.float64,
+        "out_humidity": np.float64,
+        "dew_point": np.float64,
+        "wind_speed": np.float64,
+        "wind_dir": np.str,
+        "gust": np.float64,
+        "bar": np.float64,
+        "rain_data": np.float64,
+    }
+    df = pd.read_csv(StringIO(data), sep="\t", parse_dates=[0], date_parser=date_parser, na_values=["---", "------"],
+                     dtype=dtypes)
 
     df.set_index("datetime", inplace=True)
     df = df.tz_localize(time_zone, ambiguous=False)
